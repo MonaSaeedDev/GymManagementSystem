@@ -1,7 +1,7 @@
 ﻿using Gym.Application.Interfaces.Repositories;
 using Gym.Domain.Entities;
 
-namespace Gym.Application.Interfaces;
+namespace Gym.Application.Interfaces.UnitOfWork;
 
 public interface IUnitOfWork : IDisposable
 {
@@ -10,5 +10,6 @@ public interface IUnitOfWork : IDisposable
     IGenericReository<Session> Sessions { get; }
     IGenericReository<Booking> Bookings { get; }
     IGenericReository<MembershipPlan> MembershipPlans { get; }
+
     Task<int> SaveChangesAsync(CancellationToken ct = default);
 }

@@ -8,8 +8,8 @@ public class Session : BaseEntity
     public string Title { get; private set; } = null!;
     public int Capacity { get; private set; }
     public SessionStatus Status { get; private set; }
-    public int TraineerId { get; private set; }
-    public Trainer Traineer { get; private set; } = null!;
+    public int TrainerId { get; private set; }
+    public Trainer Trainer { get; private set; } = null!;
 
     private readonly List<Booking> _bookings = new(); 
     public IReadOnlyCollection<Booking> Bookings => _bookings;
@@ -27,7 +27,7 @@ public class Session : BaseEntity
     {
         Title = title;
         Capacity = capacity;
-        TraineerId = trainerId;
+        TrainerId = trainerId;
         Date = date;
         StartTime = startTime;
     }

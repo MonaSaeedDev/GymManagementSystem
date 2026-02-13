@@ -1,4 +1,5 @@
-using Gym.Application.Interfaces;
+using Gym.Application;
+using Gym.Application.Interfaces.UnitOfWork;
 using Gym.Infrastructure.Data;
 using Gym.Infrastructure.UnitOfWork;
 using Microsoft.EntityFrameworkCore;
@@ -12,6 +13,8 @@ builder.Services.AddDbContext<GymDbContext>(options =>
         builder.Configuration.GetConnectionString("DefaultConnection")
     )
 );
+
+builder.Services.AddApplication();
 
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 

@@ -30,11 +30,7 @@ public class GenericRepository<TEntity> : IGenericReository<TEntity>
         return list.AsReadOnly();
     }
     public async Task<IReadOnlyList<TEntity>> GetAllAsync(CancellationToken ct = default)
-    {
-        var list =  await _dbSet.AsNoTracking()
-                             .ToListAsync(ct);
-        return list.AsReadOnly();
-    }
+   => await _dbSet.AsNoTracking().ToListAsync(ct);
     public void Remove(TEntity entity) => _dbSet.Remove(entity);
     public void Update(TEntity entity)
     {

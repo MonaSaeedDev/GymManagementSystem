@@ -1,5 +1,5 @@
-﻿using Gym.Application.Interfaces;
-using Gym.Application.Interfaces.Repositories;
+﻿using Gym.Application.Interfaces.Repositories;
+using Gym.Application.Interfaces.UnitOfWork;
 using Gym.Domain.Entities;
 using Gym.Infrastructure.Data;
 using Gym.Infrastructure.Repositories;
