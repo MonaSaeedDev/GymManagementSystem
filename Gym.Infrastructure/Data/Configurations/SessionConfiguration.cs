@@ -29,12 +29,12 @@ public class SessionConfiguration : IEntityTypeConfiguration<Session>
         builder.Property(s => s.StartTime)
             .IsRequired();
 
-        builder.Property(s => s.TraineerId)
+        builder.Property(s => s.TrainerId)
             .IsRequired();
 
-        builder.HasOne(s => s.Traineer)
+        builder.HasOne(s => s.Trainer)
             .WithMany(t => t.Sessions)
-            .HasForeignKey(s => s.TraineerId)
+            .HasForeignKey(s => s.TrainerId)
             .OnDelete(DeleteBehavior.Restrict);
     }
 }

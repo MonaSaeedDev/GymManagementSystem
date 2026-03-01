@@ -1,0 +1,84 @@
+using Gym.Application.DTOs.Bookings;
+using Gym.Application.Exceptions;
+using Gym.Application.Interfaces.Services;
+using Gym.Application.Interfaces.UnitOfWork;
+using Gym.Domain.Entities;
+
+namespace Gym.Application.Services;
+
+public sealed class BookingService : IBookingService
+{
+    private readonly IUnitOfWork _uow;
+
+    public BookingService(IUnitOfWork uow) => _uow = uow;
+
+    public async Task<BookingResponse> BookAsync(CreateBookingRequest request, CancellationToken ct = default)
+    {
+        var member = await _uow.Members.GetByIdAsync(request.MemberId, ct);
+        if (member is null)
+            throw new NotFoundException($"Member with id {request.MemberId} was not found.");
+
+        var session = await _uow.Sessions.GetByIdAsync(request.SessionId, ct);
+        if (session is null)
+            throw new NotFoundException($"Session with id {request.SessionId} was not found.");
+
+        var allBookings = await _uow.Bookings.ListAsync(ct);
+        var sessionBookings = allBookings.Where(b => b.SessionId == request.SessionId).ToList();
+
+        if (sessionBookings.Count >= session.Capacity)
+            throw new BusinessRuleException("Session is full.");
+
+        if (sessionBookings.Any(b => b.MemberId == request.MemberId))
+            throw new BusinessRuleException("Member already booked this session.");
+
+        var booking = new Booking(request.MemberId, request.SessionId);
+
+        await _uow.Bookings.AddAsync(booking, ct);
+
+        if (sessionBookings.Count + 1 >= session.Capacity)
+            session.MarkAsFull();
+
+        await _uow.SaveChangesAsync(ct);
+
+        return new BookingResponse(
+            Id: booking.Id,
+            MemberId: booking.MemberId,
+            MemberName: member.FullName,
+            SessionId: booking.SessionId,
+            SessionTitle: session.Title,
+            BookingDate: booking.BookingDate,
+            CreatedAt: booking.CreatedAt,
+            UpdatedAt: booking.UpdatedAt
+        );
+    }
+
+    public async Task CancelAsync(int bookingId, CancellationToken ct = default)
+    {
+        var booking = await _uow.Bookings.GetByIdAsync(bookingId, ct);
+        if (booking is null)
+            throw new NotFoundException($"Booking with id {bookingId} was not found.");
+
+        _uow.Bookings.Delete(booking);
+        await _uow.SaveChangesAsync(ct);
+    }
+
+    public async Task<IReadOnlyList<BookingListItem>> ListAsync(CancellationToken ct = default)
+    {
+        var bookings = await _uow.Bookings.ListAsync(ct);
+
+        var members = await _uow.Members.ListAsync(ct);
+        var sessions = await _uow.Sessions.ListAsync(ct);
+
+        var memberNames = members.ToDictionary(m => m.Id, m => m.FullName);
+        var sessionTitles = sessions.ToDictionary(s => s.Id, s => s.Title);
+
+        return bookings.Select(b => new BookingListItem(
+            Id: b.Id,
+            MemberId: b.MemberId,
+            MemberName: memberNames.TryGetValue(b.MemberId, out var mn) ? mn : string.Empty,
+            SessionId: b.SessionId,
+            SessionTitle: sessionTitles.TryGetValue(b.SessionId, out var st) ? st : string.Empty,
+            BookingDate: b.BookingDate
+        )).ToList();
+    }
+}
