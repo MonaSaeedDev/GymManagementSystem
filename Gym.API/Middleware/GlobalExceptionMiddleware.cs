@@ -31,6 +31,16 @@ public sealed class GlobalExceptionMiddleware : IMiddleware
                 Status = StatusCodes.Status400BadRequest
             });
         }
+        catch (ConflictException ex)
+        {
+            context.Response.StatusCode = StatusCodes.Status409Conflict;
+            await context.Response.WriteAsJsonAsync(new ProblemDetails
+            {
+                Title = "Resource already exists",
+                Detail = ex.Message,
+                Status = StatusCodes.Status409Conflict
+            });
+        }
         catch (Exception ex) 
         { 
             context.Response.StatusCode = StatusCodes.Status500InternalServerError;

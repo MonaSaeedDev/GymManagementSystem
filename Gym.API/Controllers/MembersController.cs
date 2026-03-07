@@ -1,4 +1,5 @@
-﻿using Gym.Application.DTOs.Members;
+﻿using Gym.Application.DTOs.Common;
+using Gym.Application.DTOs.Members;
 using Gym.Application.Interfaces.Services;
 using Microsoft.AspNetCore.Mvc;
 
@@ -37,5 +38,13 @@ public sealed class MembersController : ControllerBase
     {
         var items = await _memberService.ListAsync(ct);
         return Ok(items);
+    }
+
+    [HttpGet("paged")]
+    [ProducesResponseType(typeof(PagedResponse<MemberListItem>), StatusCodes.Status200OK)]
+    public async Task<ActionResult<PagedResponse<MemberListItem>>> PagedList([FromQuery] PagedRequest request, CancellationToken ct)
+    {
+        var result = await _memberService.ListPagedAsync(request, ct);
+        return Ok(result);
     }
 }

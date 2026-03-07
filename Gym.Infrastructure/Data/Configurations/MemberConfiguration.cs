@@ -20,6 +20,9 @@ public class MemberConfiguration : IEntityTypeConfiguration<Member>
             .IsRequired()
             .HasMaxLength(100);
 
+        builder.HasIndex(m => m.Email)
+            .IsUnique();
+
         builder.Property(m => m.Phone)
             .IsRequired() 
             .HasMaxLength(100);

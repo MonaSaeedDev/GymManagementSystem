@@ -38,4 +38,26 @@ public class GenericRepository<TEntity> : IGenericReository<TEntity>
             _context.Entry(entity).State = EntityState.Modified;
     }
 
+    public async Task<(IReadOnlyList<TEntity> Items, int TotalCount)> GetPagedAsync(
+        Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy,
+        int page,
+        int pageSize,
+        Expression<Func<TEntity, bool>>? predicate = null,
+        CancellationToken ct = default)
+    {
+        var query = _dbSet.AsNoTracking();
+
+        if (predicate is not null)
+            query = query.Where(predicate);
+
+        var totalCount = await query.CountAsync(ct);
+
+                query = orderBy(query);
+
+            var items = await query.Skip((page - 1) * pageSize)
+                                   .Take(pageSize)
+                                   .ToListAsync(ct);
+
+            return (items.AsReadOnly(), totalCount);
+    }
 }

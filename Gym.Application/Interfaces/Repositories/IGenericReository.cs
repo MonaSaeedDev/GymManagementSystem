@@ -12,5 +12,11 @@ public interface IGenericReository<TEntity> where TEntity : class
     public Task AddAsync(TEntity entity, CancellationToken ct = default);
     public void Update(TEntity entity);
     public void Remove(TEntity entity);
-}
 
+    public Task<(IReadOnlyList<TEntity> Items, int TotalCount)> GetPagedAsync(
+        Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy,
+        int page, 
+        int pageSize,
+        Expression<Func<TEntity, bool>>? predicate = null,
+        CancellationToken ct = default);
+}

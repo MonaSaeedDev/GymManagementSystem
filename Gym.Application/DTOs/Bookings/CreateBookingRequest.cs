@@ -1,6 +1,8 @@
-﻿namespace Gym.Application.DTOs.Bookings;
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace Gym.Application.DTOs.Bookings;
 
 public sealed record CreateBookingRequest(
-    int MemberId,
-    int SessionId
+    [param: Range(1, int.MaxValue), Required] int MemberId,
+    [param: Range(1, int.MaxValue)] int SessionId
 );
