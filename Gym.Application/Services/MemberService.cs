@@ -123,7 +123,7 @@ namespace Gym.Application.Services
             var sortBy = request.SortBy?.Trim();
             var isDesc = request.SortDir == SortDirection.Desc;
 
-            if (string.IsNullOrWhiteSpace(request.SortBy))
+            if (string.IsNullOrWhiteSpace(sortBy))
               return q => isDesc ? q.OrderByDescending(m => m.Id) : q.OrderBy(m => m.Id);
 
             return sortBy.ToLowerInvariant() switch
